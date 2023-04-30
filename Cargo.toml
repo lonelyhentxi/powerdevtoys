@@ -1,0 +1,19 @@
+[workspace]
+members = [
+  "crates/raster_transformer",
+]
+
+[profile.release]
+# lto = true
+
+# We use CARGO_PROFILE_RELEASE_LTO for production builds
+# lto = "fat"
+
+# debug = true
+# opt-level = 'z'
+
+[profile.bench]
+debug = true
+# lto = true
+
+# Without this, printing diff consumes more than a minute.
