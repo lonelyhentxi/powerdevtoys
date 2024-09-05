@@ -1,0 +1,36 @@
+{
+  "name": "@powerdevtoys/webui-react",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "rsbuild dev",
+    "build": "rsbuild build",
+    "preview": "rsbuild preview",
+    "tauri": "tauri"
+  },
+  "dependencies": {
+    "@radix-ui/react-slot": "^1.1.0",
+    "@tauri-apps/api": "^2.0.0-rc.4",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.438.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "rxjs": "^7.8.1",
+    "tailwind-merge": "^2.5.2",
+    "tailwindcss-animate": "^1.0.7",
+    "tsyringe": "^4.8.0"
+  },
+  "devDependencies": {
+    "@rsbuild/core": "1.0.1-rc.4",
+    "@rsbuild/plugin-react": "1.0.1-rc.4",
+    "@rsbuild/plugin-sass": "1.0.1-rc.4",
+    "@types/node": "^22.5.4",
+    "@types/react": "^18.2.15",
+    "@types/react-dom": "^18.2.7",
+    "autoprefixer": "^10.4.20",
+    "tailwindcss": "^3.4.10",
+    "typescript": "^5.2.2"
+  }
+}

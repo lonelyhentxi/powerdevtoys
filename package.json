@@ -1,0 +1,21 @@
+{
+  "name": "powerdevtoys",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tauri dev",
+    "build": "tauri build",
+    "web:dev": "pnpm run --filter=@powerdevtoys/webui-react dev",
+    "web:build": "pnpm run --filter=@powerdevtoys/webui-react build",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "2.0.0-rc.11",
+    "husky": "^9.1.5"
+  }
+}
