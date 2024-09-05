@@ -9,6 +9,6 @@
   "include": [
     "rsbuild.config.ts",
     "postcss.config.ts",
-    "tailwind.config.ts"
+    "tailwind.config.js"
   ]
 }

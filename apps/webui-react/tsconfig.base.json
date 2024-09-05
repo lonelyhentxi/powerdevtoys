@@ -1,0 +1,37 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+      "@ui/*": [
+        "./src/components/ui/*"
+      ],
+      "@components/*": [
+        "./src/components/*"
+      ],
+      "@lib/*": [
+        "./src/lib/*"
+      ],
+      "@utils/*": [
+        "./src/utils/*"
+      ],
+      "@services/*": [
+        "./src/services/*"
+      ],
+      "@polyfills/*": [
+        "./src/polyfills/*"
+      ],
+      "@pages/*": [
+        "./src/pages/*"
+      ],
+      "@i18n/*": [
+        "./src/i18n/*"
+      ],
+      "@defs/*": [
+        "./src/defs/*"
+      ]
+    }
+  }
+}
