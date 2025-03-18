@@ -1,7 +1,7 @@
 [package]
 name = "raster-transformer"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [lib]
@@ -11,9 +11,9 @@ crate-type = ["cdylib", "rlib"]
 default = ["console_error_panic_hook"]
 
 [dependencies]
-base64 = "0.21.0"
-image = { version = "0.24.6", features = ["libwebp", "ravif", "webp-encoder"] }
-wasm-bindgen = "0.2.63"
+base64 = "0.22"
+image = { version = "0.25", features = ["webp", "avif"] }
+wasm-bindgen = "0.2"
 # The `console_error_panic_hook` crate provides better debugging of panics by
 # logging them with `console.error`. This is great for development, but requires
 # all the `std::fmt` and `std::panicking` infrastructure, so isn't great for
@@ -23,12 +23,12 @@ console_error_panic_hook = { version = "0.1.6", optional = true }
 # `wee_alloc` is a tiny allocator for wasm that is only ~1K in code size
 # compared to the default allocator's ~10K. It is slower than the default
 # allocator, however.
-wee_alloc = { version = "0.4.5", optional = true }
-anyhow = "1.0.70"
-libwebp-sys2 = { version = "0.1.7", features = ["mux", "demux", "1_1"] }
+wee_alloc = { version = "0.4", optional = true }
+anyhow = "1"
+libwebp-sys2 = { version = "0.2.0", features = ["mux", "demux", "1_1"] }
 
 [dev-dependencies]
-wasm-bindgen-test = "0.3.13"
+wasm-bindgen-test = "0.3"
 
 [profile.release]
 # Tell `rustc` to optimize for small code size.

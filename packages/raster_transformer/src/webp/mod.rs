@@ -1,8 +1,19 @@
 use crate::core::{RGBA8AnimatedImageData, RGBA8ImageDataType, RGBA8StaticImageData};
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 use image::{EncodableLayout, Rgba, RgbaImage};
 use libwebp_sys::{
-    VP8StatusCode, WebPAnimEncoder, WebPAnimEncoderAdd, WebPAnimEncoderAssemble,
+    MODE_RGBA, VP8_ENC_ERROR_BAD_DIMENSION, VP8_ENC_ERROR_BAD_WRITE,
+    VP8_ENC_ERROR_BITSTREAM_OUT_OF_MEMORY, VP8_ENC_ERROR_FILE_TOO_BIG,
+    VP8_ENC_ERROR_INVALID_CONFIGURATION, VP8_ENC_ERROR_LAST, VP8_ENC_ERROR_NULL_PARAMETER,
+    VP8_ENC_ERROR_OUT_OF_MEMORY, VP8_ENC_ERROR_PARTITION_OVERFLOW,
+    VP8_ENC_ERROR_PARTITION0_OVERFLOW, VP8_ENC_ERROR_USER_ABORT, VP8_ENC_OK,
+    VP8_STATUS_BITSTREAM_ERROR, VP8_STATUS_INVALID_PARAM, VP8_STATUS_NOT_ENOUGH_DATA,
+    VP8_STATUS_OK, VP8_STATUS_OUT_OF_MEMORY, VP8_STATUS_SUSPENDED, VP8_STATUS_UNSUPPORTED_FEATURE,
+    VP8_STATUS_USER_ABORT, VP8StatusCode, WEBP_FF_BACKGROUND_COLOR, WEBP_FF_CANVAS_HEIGHT,
+    WEBP_FF_CANVAS_WIDTH, WEBP_FF_FORMAT_FLAGS, WEBP_FF_FRAME_COUNT, WEBP_FF_LOOP_COUNT,
+    WEBP_MUX_BAD_DATA, WEBP_MUX_BLEND, WEBP_MUX_DISPOSE_BACKGROUND, WEBP_MUX_INVALID_ARGUMENT,
+    WEBP_MUX_MEMORY_ERROR, WEBP_MUX_NOT_ENOUGH_DATA, WEBP_MUX_NOT_FOUND, WEBP_MUX_OK,
+    WEBP_PRESET_DEFAULT, WebPAnimEncoder, WebPAnimEncoderAdd, WebPAnimEncoderAssemble,
     WebPAnimEncoderDelete, WebPAnimEncoderGetError, WebPAnimEncoderNew, WebPAnimEncoderOptions,
     WebPAnimEncoderOptionsInit, WebPBitstreamFeatures, WebPConfig, WebPConfigPreset, WebPData,
     WebPDataClear, WebPDataInit, WebPDecode, WebPDecoderConfig, WebPDemux, WebPDemuxDelete,
@@ -11,20 +22,10 @@ use libwebp_sys::{
     WebPInitDecoderConfig, WebPIterator, WebPMemoryWrite, WebPMemoryWriter, WebPMemoryWriterClear,
     WebPMemoryWriterInit, WebPMux, WebPMuxAnimBlend, WebPMuxAnimDispose, WebPMuxAnimParams,
     WebPMuxAssemble, WebPMuxCreate, WebPMuxDelete, WebPMuxError, WebPMuxSetAnimationParams,
-    WebPPicture, WebPPictureFree, WebPPictureImportRGBA, WebPPictureInit, MODE_RGBA,
-    VP8_ENC_ERROR_BAD_DIMENSION, VP8_ENC_ERROR_BAD_WRITE, VP8_ENC_ERROR_BITSTREAM_OUT_OF_MEMORY,
-    VP8_ENC_ERROR_FILE_TOO_BIG, VP8_ENC_ERROR_INVALID_CONFIGURATION, VP8_ENC_ERROR_LAST,
-    VP8_ENC_ERROR_NULL_PARAMETER, VP8_ENC_ERROR_OUT_OF_MEMORY, VP8_ENC_ERROR_PARTITION0_OVERFLOW,
-    VP8_ENC_ERROR_PARTITION_OVERFLOW, VP8_ENC_ERROR_USER_ABORT, VP8_ENC_OK,
-    VP8_STATUS_BITSTREAM_ERROR, VP8_STATUS_INVALID_PARAM, VP8_STATUS_NOT_ENOUGH_DATA,
-    VP8_STATUS_OK, VP8_STATUS_OUT_OF_MEMORY, VP8_STATUS_SUSPENDED, VP8_STATUS_UNSUPPORTED_FEATURE,
-    VP8_STATUS_USER_ABORT, WEBP_FF_BACKGROUND_COLOR, WEBP_FF_CANVAS_HEIGHT, WEBP_FF_CANVAS_WIDTH,
-    WEBP_FF_FORMAT_FLAGS, WEBP_FF_FRAME_COUNT, WEBP_FF_LOOP_COUNT, WEBP_MUX_BAD_DATA,
-    WEBP_MUX_BLEND, WEBP_MUX_DISPOSE_BACKGROUND, WEBP_MUX_INVALID_ARGUMENT, WEBP_MUX_MEMORY_ERROR,
-    WEBP_MUX_NOT_ENOUGH_DATA, WEBP_MUX_NOT_FOUND, WEBP_MUX_OK, WEBP_PRESET_DEFAULT,
+    WebPPicture, WebPPictureFree, WebPPictureImportRGBA, WebPPictureInit,
 };
 use std::{
-    ffi::{c_int, c_void, CStr},
+    ffi::{CStr, c_int, c_void},
     mem::MaybeUninit,
 };
 
@@ -125,7 +126,7 @@ impl WebPDataAdapter {
             WebPDataInit(webp_data.as_mut_ptr());
 
             {
-                let mut webp_data = webp_data.assume_init_mut();
+                let webp_data = webp_data.assume_init_mut();
                 webp_data.bytes = cloned.as_ptr();
                 webp_data.size = cloned.len();
             }
@@ -166,15 +167,15 @@ impl WebPDataAdapter {
     }
 
     pub unsafe fn mut_bytes(&mut self) -> *mut u8 {
-        self.webp_data.assume_init_mut().bytes as *mut _
+        unsafe { self.webp_data.assume_init_mut().bytes as *mut _ }
     }
 
     pub unsafe fn bytes(&self) -> *const u8 {
-        self.webp_data.assume_init_ref().bytes
+        unsafe { self.webp_data.assume_init_ref().bytes }
     }
 
     pub unsafe fn size(&self) -> usize {
-        self.webp_data.assume_init_ref().size
+        unsafe { self.webp_data.assume_init_ref().size }
     }
 }
 
@@ -261,7 +262,7 @@ impl WebPPictureAdapter {
         let mut wrt = WebPMemoryWriterAdapter::new();
 
         unsafe {
-            let mut pic = pic.assume_init_mut();
+            let pic = pic.assume_init_mut();
 
             pic.use_argb = 1;
 
@@ -361,7 +362,7 @@ impl WebPAnimEncoderAdapter {
         unsafe {
             WebPConfigPreset(config.as_mut_ptr(), WEBP_PRESET_DEFAULT, quality);
 
-            let mut config = config.assume_init_mut();
+            let config = config.assume_init_mut();
 
             config.quality = quality;
             config.lossless = 0;
@@ -371,10 +372,7 @@ impl WebPAnimEncoderAdapter {
 
             if WebPAnimEncoderAdd(self.0, frame_pic.as_mut_ptr(), timestamp_ms as i32, config) == 0
             {
-                return Err(anyhow!(
-                    "WebPAnimEncoderAdd error: {}",
-                    self.get_error()       
-                ));
+                return Err(anyhow!("WebPAnimEncoderAdd error: {}", self.get_error()));
             }
         }
         Ok(())
@@ -831,14 +829,8 @@ pub fn encode_animated_webp(image_data: RGBA8AnimatedImageData, quality: f32) ->
 
             let width = frame.width();
             let height = frame.height();
-            
-            enc.add_rgba8_frame(
-                frame.as_bytes(),
-                width,
-                height,
-                timestamp_ms,
-                quality,
-            )?;
+
+            enc.add_rgba8_frame(frame.as_bytes(), width, height, timestamp_ms, quality)?;
         }
 
         let mut webp_data = enc.assemble()?;
@@ -876,8 +868,7 @@ pub fn encode_static_webp(image_data: RGBA8StaticImageData, quality: f32) -> Res
         config.lossless = 0;
         config.method = 6;
 
-        let mut pic =
-            WebPPictureAdapter::from_rgba8(image_data.data.as_bytes(), width, height)?;
+        let mut pic = WebPPictureAdapter::from_rgba8(image_data.data.as_bytes(), width, height)?;
 
         pic.encode(config)?;
 

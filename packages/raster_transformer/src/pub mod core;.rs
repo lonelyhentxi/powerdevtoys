@@ -2,9 +2,9 @@ pub mod core;
 mod utils;
 pub mod webp;
 
-use anyhow::Result;
-use base64::{engine::general_purpose, Engine as _};
-use image::AnimationDecoder;
+use anyhow::{Result, anyhow};
+use base64::{Engine as _, engine::general_purpose};
+use image::{AnimationDecoder, EncodableLayout};
 use wasm_bindgen::prelude::*;
 use webp::decode_webp;
 
@@ -22,13 +22,15 @@ impl RGBA8ImageDataType {
         if extname.ends_with(".webp") {
             decode_webp(data)
         } else if extname.ends_with(".png") {
-            let decoded_png_data = image::codecs::png::PngDecoder::new(data)?;
-            if decoded_png_data.is_apng() {
-                let frames = decoded_png_data.apng().into_frames().collect_frames()?;
-                RGBA8AnimatedImageData::decode(frames).map(|img| RGBA8ImageDataType::Animated(img))
-            } else {
-                RGBA8StaticImageData::decode(data).map(|img| RGBA8ImageDataType::Static(img))
+            let cursor = std::io::Cursor::new(data = image::codecs::png::PngDecoder::new(cursor).map_err(|e| anyhow!("PngDecoder error: {}", e))?;
+            
+            let frames_result = decoder.into_frames().collect_frames();
+            
+            match frames_result {
+                Ok(frames) => RGBA8AnimatedImageData::decode(frames).map(|img| RGBA8ImageDataType::Animated(img)),
+                Err(_) => RGBA8StaticImageData::decode(data).map(|img| RGBA8ImageDataType::Static(img)),
             }
+            
         } else {
             unimplemented!("unsupported image format now!")
         }
